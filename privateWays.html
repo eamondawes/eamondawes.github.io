@@ -11,6 +11,21 @@
       fill: transparent;
       stroke-width: .2px;
     }
+    #info {
+      height: 150px;
+      width: 20%;
+      background: rgba(256, 256, 256, 0.9);
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      z-index: 10;
+      border-radius: 15px;
+    }
+    p {
+    color: #400D51;
+    padding-left: 10px;
+    font-family: Georgia;
+    }
   </style>
 </head>
 
@@ -20,7 +35,10 @@
       <g class="map"></g>
     </svg>
   </div>
-  
+  <div id="info">
+    <p>This map shows the private ways in Waltham as determined by recent GIS data in purple. You can see my understand of all private ways <a href="https://github.com/eamondawes/geowaltham/blob/main/private_ways.csv">here</a></p>
+    <p>You can click, drag, and zoom in with the mouse.</p>
+  </div>
   <script>
 
     function update(geojson) {
