@@ -22,7 +22,7 @@
       border-radius: 15px;
     }
     p {
-    color: #400D51;
+    color: #333;
     padding-left: 10px;
     font-family: Georgia;
     }
@@ -36,10 +36,13 @@
     </svg>
   </div>
   <div id="info">
-    <p>This map shows the private ways in Waltham as determined by recent GIS data in purple. You can see my understanding of all private ways <a href="https://github.com/eamondawes/geowaltham/blob/main/private_ways.csv">here</a></p>
+    <p>This map shows which residential units are owner-occupied. Blue parcels are owner-occupied, orange parcels are not. I have so-so confidence in the data, so use it to understand neighboorhood compostion rather than an individual property.</p>
     <p>You can click, drag, and zoom in with the mouse.</p>
   </div>
   <script>
+  
+    var colors={"Y":"#75DBCD","M":"#DCDBA8","N":"#FAA381"}
+    var res_LUC=["013","019","031","091","101","102","104","105","109","111","112","121","125"]
 
     function update(geojson) {
       let projection = d3.geoEquirectangular().fitSize([800, 800], geojson);
@@ -51,7 +54,7 @@
       u.enter()
         .append('path')
         .attr('d', geoGenerator)
-        .style("fill", function (d) { if (d.properties.POLY_TYPE == "PRIV_ROW") {return "#400D51";} else return "#fff";});
+        .style("fill", function (d) { if (d.properties.OwnerOccup && res_LUC.includes(d.properties.LUC)) {return colors[d.properties.OwnerOccup];} else return "#fff";});
                
     }
     
