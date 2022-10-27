@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>GeoJSON</title>
+  <meta charset="utf-8">
+  <script src="https://d3js.org/d3.v5.js"></script>
+  <style>
+    #content .map path {
+      stroke: #999;
+      fill: transparent;
+      stroke-width: .2px;
+    }
+    #info {
+      height: 150px;
+      width: 20%;
+      background: rgba(256, 256, 256, 0.9);
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      z-index: 10;
+      border-radius: 15px;
+    }
+    p {
+    color: #333;
+    padding-left: 10px;
+    font-family: Georgia;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="content">
+    <svg width="1200" height="1000">
+      <g class="map"></g>
+    </svg>
+  </div>
+  <div id="info">
+    <p>A proposed ordinance requires property owners to shovel their sidewalks after snowstorms. It excludes single-family and two-family houses which this map shows in blue. Streets with these properties are not guaranteed to have clear sidewalks all winter long.</p>
+    <p>You can click, drag, and zoom in with the mouse.</p>
+  </div>
+  <script>
+  
+    var res_LUC=["101","104"]
+
+    function update(geojson) {
+      let projection = d3.geoEquirectangular().fitSize([800, 800], geojson);
+      let geoGenerator = d3.geoPath().projection(projection);
+      let u = d3.select('#content g.map')
+        .selectAll('path')
+        .data(geojson.features);
+
+      u.enter()
+        .append('path')
+        .attr('d', geoGenerator)
+        .style("fill", function (d) { if (res_LUC.includes(d.properties.LUC)) {return "#2292A4";} else return "#fff";});
+               
+    }
+    
+    d3.json("https://eamondawes.github.io/waltham_parcels.geojson").then(function(data) {
+      update(data);
+    });
+    
+    <!--https://stackoverflow.com/questions/17093614/d3-geo-performance-on-pan-zoom-->
+    <!--https://yangdanny97.github.io/blog/2019/08/24/D3-Mapmaking-Tips-->
+    var zoom = d3.zoom()
+      .on('zoom', function() {
+          d3.select('svg g')
+           .attr('transform', d3.event.transform);
+    });
+
+    d3.select('svg').call(zoom);
+    
+  </script>
+  
+</body>
+
+</html>
