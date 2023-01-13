@@ -63,7 +63,7 @@
           if(d.properties['units']){
             SQM_TO_ACRES = 4046.86
             density = d.properties.units/(d.properties.SHAPE_Area/SQM_TO_ACRES)
-            if(d.properties.LUC[0] == "1" && d.properties.units > 0){
+            if((d.properties.LUC[0] == "1" || d.properties.LUC == "013" || d.properties.LUC == "031") && d.properties.units > 0){
               if(density > 30){
                 return "#54315E";
               }
