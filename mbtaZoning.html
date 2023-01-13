@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>GeoJSON</title>
+  <meta charset="utf-8">
+  <script src="https://d3js.org/d3.v5.js"></script>
+  <style>
+    #content .map path {
+      stroke: #999;
+      fill: transparent;
+      stroke-width: .2px;
+    }
+    #info {
+      height: 180px;
+      width: 30%;
+      background: rgba(256, 256, 256, 0.9);
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      z-index: 10;
+      border-radius: 15px;
+    }
+    p {
+    color: #333;
+    padding-left: 10px;
+    font-family: Georgia;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="content">
+    <svg width="1200" height="1000">
+      <g class="map"></g>
+    </svg>
+  </div>
+  <div id="info">
+    <p>MBTA zoning, <a href="https://www.mass.gov/info-details/multi-family-zoning-requirement-for-mbta-communities">Section 3A</a>, requires 15 units per acre. Very few areas in Waltham are zoned for that, but we effectively have that density in many parts of the city. The circles represent 1/2 mile from our commuter rail stations.</p>
+    <p><b>Built units per Acre:</b></p>
+    <p>
+    <span style="font-size: 2em; color:#54315E">&#9632;</span> &gt 30
+    <span style="font-size: 2em; color:#8F54A0">&nbsp &#9632;</span> &gt 20
+    <span style="font-size: 2em; color:#BC94C7">&nbsp &#9632;</span> &gt 15
+    <span style="font-size: 2em; color:#9CBFAF">&nbsp &#9632;</span> &gt 10
+    <span style="font-size: 2em; color:#6B9E87">&nbsp &#9632;</span> &gt 5
+    <span style="font-size: 2em; color:#496F5E">&nbsp &#9632;</span> &lt 5
+    </p>
+  </div>
+  <script>
+
+    function update(geojson) {
+      let projection = d3.geoEquirectangular().fitSize([800, 800], geojson);
+      let geoGenerator = d3.geoPath().projection(projection);
+      let u = d3.select('#content g.map')
+        .selectAll('path')
+        .data(geojson.features);
+
+      u.enter()
+        .append('path')
+        .attr('d', geoGenerator)
+        .style("fill", function (d) {
+          if(d.properties['units']){
+            SQM_TO_ACRES = 4046.86
+            density = d.properties.units/(d.properties.SHAPE_Area/SQM_TO_ACRES)
+            if(d.properties.LUC[0] == "1" && d.properties.units > 0){
+              if(density > 30){
+                return "#54315E";
+              }
+              else if(density > 20){
+                return "#8F54A0";
+              }
+              else if(density > 15){
+                return "#BC94C7";
+              }
+              else if(density > 10){ 
+                return "#9CBFAF";
+              }
+              else if(density > 5){ 
+                return "#6B9E87";
+              }
+              else{
+                return "#496F5E";
+              }
+            
+            return "#EEEEEE";
+            }
+            else{
+              return "#EEEEEE";
+            }
+        }});
+    }
+    
+    d3.json("https://eamondawes.github.io/waltham_parcels.geojson").then(function(data) {
+      update(data);
+      
+      d3.select('svg g')
+        .insert('ellipse')
+        .attr("rx",85)
+        .attr("ry",62)
+        .attr("cx",440)
+        .attr("cy",528)
+        .style("stroke","red")
+        .style("fill","none")
+        .style("stroke-width",".4");
+        
+      d3.select('svg g')
+        .insert('ellipse')
+        .attr("rx",85)
+        .attr("ry",62)
+        .attr("cx",230)
+        .attr("cy",635)
+        .style("stroke","red")
+        .style("fill","none")
+        .style("stroke-width",".4");
+    });
+    
+    <!--https://stackoverflow.com/questions/17093614/d3-geo-performance-on-pan-zoom-->
+    <!--https://yangdanny97.github.io/blog/2019/08/24/D3-Mapmaking-Tips-->
+    var zoom = d3.zoom()
+      .on('zoom', function() {
+          d3.select('svg g')
+           .attr('transform', d3.event.transform);
+    });
+      
+    d3.select('svg').call(zoom);
+    
+  </script>
+  
+</body>
+
+</html>
+
